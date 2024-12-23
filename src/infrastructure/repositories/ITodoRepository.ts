@@ -1,9 +1,9 @@
 import { Todo } from '../../domain/entities/Todo'
 
 export interface ITodoRepository {
-    findAll(): Todo[]
-    findById(id: string): Todo | undefined
-    create(todo: Todo): Todo
-    update(todo: Todo): Todo
-    delete(id: string): void
+    findAll(): Promise<Todo[]>
+    findById(id: string): Promise<Todo | null>
+    create(todo: Todo): Promise<Todo>
+    update(id: string, todo: Partial<Todo>): Promise<Todo | null>
+    delete(id: string): Promise<boolean>
 } 

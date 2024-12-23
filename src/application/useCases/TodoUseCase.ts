@@ -1,47 +1,27 @@
 import { Todo, CreateTodoDTO, UpdateTodoDTO } from '../../domain/entities/Todo'
-import { ITodoRepository } from '../../infrastructure/repositories/TodoRepository'
+import { ITodoRepository } from '../../infrastructure/repositories/ITodoRepository'
 
 export class TodoUseCase {
-    constructor(private todoRepository: ITodoRepository) { }
+    constructor(private repository: ITodoRepository) { }
 
-    getAllTodos(): Todo[] {
-        return this.todoRepository.findAll()
+    async getAllTodos(): Promise<Todo[]> {
+        return this.repository.findAll()
     }
 
-    getTodoById(id: string): Todo | undefined {
-        return this.todoRepository.findById(id)
+    async getTodoById(id: string): Promise<Todo | null> {
+        return this.repository.findById(id)
     }
 
-    createTodo(dto: CreateTodoDTO): Todo {
-        const newTodo: Todo = {
-            id: crypto.randomUUID(),
-            title: dto.title,
-            completed: false,
-            createdAt: new Date()
-        }
-        return this.todoRepository.create(newTodo)
+    async createTodo(dto: CreateTodoDTO): Promise<Todo> {
+        const todo = new Todo({ title: dto.title })
+        return this.repository.create(todo)
     }
 
-    updateTodo(id: string, dto: UpdateTodoDTO): Todo {
-        const todo = this.todoRepository.findById(id)
-        if (!todo) {
-            throw new Error('Todo not found')
-        }
-
-        const updatedTodo: Todo = {
-            ...todo,
-            ...dto,
-            id: todo.id // id는 변경 불가
-        }
-
-        return this.todoRepository.update(updatedTodo)
+    async updateTodo(id: string, dto: UpdateTodoDTO): Promise<Todo | null> {
+        return this.repository.update(id, dto)
     }
 
-    deleteTodo(id: string): void {
-        const todo = this.todoRepository.findById(id)
-        if (!todo) {
-            throw new Error('Todo not found')
-        }
-        this.todoRepository.delete(id)
+    async deleteTodo(id: string): Promise<boolean> {
+        return this.repository.delete(id)
     }
 } 
